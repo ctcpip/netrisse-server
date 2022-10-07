@@ -1,0 +1,30 @@
+{
+  "name": "netrisse-server",
+  "version": "0.1.0",
+  "description": "server to support multiplayer netrisse",
+  "main": "server.js",
+  "scripts": {
+    "test": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ctcpip/netrisse-server.git"
+  },
+  "author": "Chris de Almeida",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/ctcpip/netrisse-server/issues"
+  },
+  "homepage": "https://github.com/ctcpip/netrisse-server#readme",
+  "devDependencies": {
+    "eslint": "^8.24.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.18.1",
+    "helmet": "^6.0.0",
+    "ws": "^8.9.0"
+  }
+}
