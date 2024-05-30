@@ -26,7 +26,7 @@ const messageTypeEnum = Object.freeze({
 // need to implement spools so that no messages are missed from clients who haven't connected yet
 
 wsServer.on('connection', socket => {
-  socket.on('message', rawData => { // eslint-disable-line complexity
+  socket.on('message', rawData => {
     const message = JSON.parse(rawData);
 
     console.log(message);
@@ -34,7 +34,6 @@ wsServer.on('connection', socket => {
     switch (message.type) {
       case messageTypeEnum.CONNECT:
       {
-
         let game = games.find(g => g.gameID === message.gameID);
 
         if (!game) {
@@ -60,7 +59,7 @@ wsServer.on('connection', socket => {
       case messageTypeEnum.DIRECTION:
       case messageTypeEnum.HOLD:
       case messageTypeEnum.PAUSE:
-      case messageTypeEnum.QUIT: // eslint-disable-line padding-line-between-statements
+      case messageTypeEnum.QUIT:
 
       {
         const game = games.find(g => g.gameID === message.gameID);
@@ -78,16 +77,13 @@ wsServer.on('connection', socket => {
       default:
         throw new Error(`unsupported message type: ${message.type}`);
     }
-
   });
 });
 
 const server = app.listen(port, () => {
-
   if (process.send) { process.send('ready'); }
 
   console.log(`netrisse server is listening on port ${port}`);
-
 });
 
 server.on('upgrade', (request, socket, head) => {
@@ -101,7 +97,6 @@ process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
 function shutdown() {
-
   wsServer.close();
   server.close();
 
@@ -110,5 +105,4 @@ function shutdown() {
       p.socket.close();
     }
   }
-
 }
