@@ -1,1 +1,1 @@
-module.exports = { games: [] };
+module.exports = { games: {} };
