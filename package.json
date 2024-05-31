@@ -4,9 +4,10 @@
   "description": "server to support multiplayer netrisse",
   "main": "server.js",
   "scripts": {
+    "circles": "madge --extensions js --circular src",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "test": "eslint ."
+    "test": "npm run lint && npm run circles "
   },
   "repository": {
     "type": "git",
@@ -20,7 +21,8 @@
   "homepage": "https://github.com/ctcpip/netrisse-server#readme",
   "devDependencies": {
     "eslint": "^9.3.0",
-    "eslint-config-ultra-mega": "^1.1.0"
+    "eslint-config-ultra-mega": "^1.2.0",
+    "madge": "^7.0.0"
   },
   "engines": {
     "node": ">=18"
