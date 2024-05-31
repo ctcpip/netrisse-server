@@ -1,5 +1,5 @@
 module.exports = class Player {
-  eventSpool = [];
+  lastEventReceived = 0;
 
   constructor(playerID, socket) {
     this.playerID = playerID;
