@@ -48,14 +48,36 @@ server.on('upgrade', (request, socket, head) => {
   });
 });
 
+const FIVE_MINUTES_MS = 5 * 10 * 1000;
+
+const purgeIntervalID = setInterval(function purgeStaleGames() {
+  // every five minutes, remove stale games
+
+  for (const gameID of Object.keys(games)) {
+    const game = games[gameID];
+    const diff = Date.now() - game.heartbeat;
+
+    if (diff >= FIVE_MINUTES_MS) {
+      // console.log(`deleting stale game ${gameID}`);
+
+      for (const playerID of Object.keys(game.players)) {
+        game.players[playerID].socket.close();
+      }
+
+      delete games[gameID];
+    }
+  }
+}, FIVE_MINUTES_MS);
+
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
 function shutdown() {
+  clearInterval(purgeIntervalID);
   wsServer.close();
   server.close();
 
-  for (const g of games) {
+  for (const g of Object.values(games)) {
     for (const p of g.players) {
       p.socket.close();
     }
@@ -65,7 +87,7 @@ function shutdown() {
 function handleMessage(socket, rawData) {
   const message = JSON.parse(rawData);
 
-  console.log(message);
+  // console.log(message);
 
   if (!arrMessageTypes.includes(message.type)) {
     throw new Error(`unsupported message type: ${message.type}`);
@@ -76,7 +98,7 @@ function handleMessage(socket, rawData) {
   // if we have a specific handler for the message type, then call it.
   // otherwise the default is just to pass the message along
   if (handler) {
-    handler(socket, rawData, message);
+    handler({ socket, rawData, message });
   }
   else {
     sendMessage(message.gameID, message.playerID, rawData);
