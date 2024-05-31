@@ -1,5 +1,5 @@
 const { messageTypeEnum } = require('../message-type-enum');
-const connect = require('./message-handlers/connect');
+const connect = require('./connect');
 const quit = require('./quit');
 
 const messageHandlers = {};

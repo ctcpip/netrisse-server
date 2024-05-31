@@ -4,7 +4,7 @@ const WebSocket = require('ws');
 const { arrMessageTypes } = require('./message-type-enum');
 const { games } = require('./common');
 const handleError = require('./handle-error');
-const sendMessage = require('../send-message');
+const sendMessage = require('./send-message');
 const messageHandlers = require('./message-handlers/handlers');
 
 const app = express();
