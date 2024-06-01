@@ -1,11 +1,13 @@
 const express = require('express');
 const helmet = require('helmet');
 const WebSocket = require('ws');
-const { arrMessageTypes } = require('./message-type-enum');
+const { Message, messageTypeEnum } = require('netrisse-lib');
 const { games } = require('./common');
 const handleError = require('./handle-error');
 const sendMessage = require('./send-message');
 const messageHandlers = require('./message-handlers/handlers');
+
+const arrMessageTypes = Object.freeze(Object.values(messageTypeEnum));
 
 const app = express();
 const port = 4752;
@@ -48,7 +50,7 @@ server.on('upgrade', (request, socket, head) => {
   });
 });
 
-const FIVE_MINUTES_MS = 5 * 10 * 1000;
+const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
 const purgeIntervalID = setInterval(function purgeStaleGames() {
   // every five minutes, remove stale games
@@ -60,11 +62,15 @@ const purgeIntervalID = setInterval(function purgeStaleGames() {
     if (diff >= FIVE_MINUTES_MS) {
       // console.log(`deleting stale game ${gameID}`);
 
-      for (const playerID of Object.keys(game.players)) {
-        game.players[playerID].socket.close();
-      }
+      // send game over
+      // make sure we wait for it to complete sending, so we don't call socket.close() before the message can be received
+      sendMessage(gameID, null, new Message(messageTypeEnum.GAME_OVER).serialize()).then(() => {
+        for (const playerID of Object.keys(game.players)) {
+          game.players[playerID].socket.close();
+        }
 
-      delete games[gameID];
+        delete games[gameID];
+      });
     }
   }
 }, FIVE_MINUTES_MS);
@@ -78,7 +84,7 @@ function shutdown() {
   server.close();
 
   for (const g of Object.values(games)) {
-    for (const p of g.players) {
+    for (const p of Object.values(g.players)) {
       p.socket.close();
     }
   }

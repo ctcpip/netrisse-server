@@ -1,4 +1,4 @@
-const { messageTypeEnum } = require('../message-type-enum');
+const { messageTypeEnum } = require('netrisse-lib');
 const connect = require('./connect');
 const quit = require('./quit');
 
