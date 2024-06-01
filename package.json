@@ -31,6 +31,11 @@
   "dependencies": {
     "express": "^4.19.2",
     "helmet": "^7.1.0",
+    "netrisse-lib": "^2.0.0",
     "ws": "^8.17.0"
-  }
+  },
+  "keywords": [
+    "netris",
+    "netrisse"
+  ]
 }
