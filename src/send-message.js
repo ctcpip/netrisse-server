@@ -1,4 +1,3 @@
-const handleError = require('./handle-error');
 const WebSocket = require('ws');
 const { games } = require('./common');
 
@@ -17,7 +16,6 @@ module.exports = function(gameID, fromPlayerID, rawData) {
           new Promise((resolve, reject) => {
             p.socket.send(rawData, err => {
               if (err) {
-                handleError(err);
                 return reject(err);
               }
               else {

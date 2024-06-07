@@ -1,5 +1,3 @@
-const express = require('express');
-const helmet = require('helmet');
 const WebSocket = require('ws');
 const { Message, messageTypeEnum } = require('netrisse-lib');
 const { games } = require('./common');
@@ -9,19 +7,20 @@ const messageHandlers = require('./message-handlers/handlers');
 
 const arrMessageTypes = Object.freeze(Object.values(messageTypeEnum));
 
-const app = express();
 const port = 4752;
 
-app.use(helmet());
+const server = new WebSocket.Server({ clientTracking: false, port }, () => {
+  if (process.send) { process.send('ready'); }
 
-const wsServer = new WebSocket.Server({ clientTracking: false, noServer: true });
+  console.log(`netrisse server is listening on port ${port}`);
+});
 
 const statusCodeEnum = Object.freeze({ PLAYER_QUIT: 4333 });
 
 // maybe the multiplayer games start out paused until someone unpauses it
 // need to implement spools so that no messages are missed from clients who haven't connected yet
 
-wsServer.on('connection', socket => {
+server.on('connection', socket => {
   socket.on('message', rawData => {
     handleMessage(socket, rawData);
   });
@@ -36,19 +35,11 @@ wsServer.on('connection', socket => {
       handleError(error);
     }
   });
+
+  socket.on('error', handleError);
 });
 
-const server = app.listen(port, () => {
-  if (process.send) { process.send('ready'); }
-
-  console.log(`netrisse server is listening on port ${port}`);
-});
-
-server.on('upgrade', (request, socket, head) => {
-  wsServer.handleUpgrade(request, socket, head, websocket => {
-    wsServer.emit('connection', websocket, request);
-  });
-});
+server.on('error', handleError);
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
@@ -80,7 +71,6 @@ process.on('SIGTERM', shutdown);
 
 function shutdown() {
   clearInterval(purgeIntervalID);
-  wsServer.close();
   server.close();
 
   for (const g of Object.values(games)) {
